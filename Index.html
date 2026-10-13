@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIS Commands - 250 Câu lệnh AI cho Giáo dục</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --sidebar-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-secondary: #64748b;
+            --accent: #2563eb;
+            --accent-light: #eff6ff;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 24px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 100;
+        }
+
+        .logo {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+        .logo h2 { font-size: 18px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+        .logo p { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+        .nav-item {
+            padding: 10px 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .nav-item:hover { background: var(--accent-light); color: var(--accent); }
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent);
+            font-weight: 600;
+            border-left-color: var(--accent);
+        }
+        .nav-count {
+            background: var(--border);
+            color: var(--text-secondary);
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        .nav-item.active .nav-count { background: var(--accent); color: white; }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 32px;
+            max-width: 100%;
+        }
+
+        .header {
+            margin-bottom: 32px;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { color: var(--text-secondary); margin-bottom: 24px; }
+
+        .search-box {
+            position: relative;
+            max-width: 600px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            background: var(--card-bg);
+            transition: all 0.2s;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .stats span { font-weight: 600; color: var(--text); }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
+        }
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--accent);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .card:hover::before { opacity: 1; }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .cmd {
+            font-family: "Fira Code", Consolas, monospace;
+            background: var(--accent-light);
+            color: var(--accent);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .card-id {
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: var(--bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .card-desc {
+            font-size: 14px;
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .card-cat {
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            font-weight: 500;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        /* Mobile */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 16px; left: 16px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            width: 40px; height: 40px;
+            border-radius: 8px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 101;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+            .main { margin-left: 0; padding: 24px 16px; padding-top: 70px; }
+            .menu-toggle { display: block; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<aside class="sidebar">
+    <div class="logo">
+        <h2>⚡ LIS Commands</h2>
+        <p>250 lệnh thao tác AI Giáo dục</p>
+    </div>
+    <nav id="categoryList"></nav>
+</aside>
+
+<main class="main">
+    <div class="header">
+        <h1>Bộ từ vựng thao tác LIS</h1>
+        <p>Từ prompt rời rạc đến ngôn ngữ điều khiển hệ sinh thái học tập thời AI. Click vào thẻ lệnh để sao chép.</p>
+        <div class="search-box">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="searchInput" placeholder="Tìm kiếm lệnh hoặc mô tả... (VD: /edudiscover, Lagrange)">
+        </div>
+    </div>
+    <div class="stats">
+        <div>Hiển thị: <span id="filteredCount">0</span> / <span>250</span> lệnh</div>
+    </div>
+    <div class="grid" id="commandGrid"></div>
+</main>
+
+<div class="toast" id="toast">Đã sao chép lệnh!</div>
+
+<script>
+    // Dữ liệu đã được làm sạch từ file PDF
+    // Format: [ID, "Lệnh", "Mô tả", ID_Nhóm]
+    const D = [
+        [1,"/educationalcomics","Biến kiến thức thành truyện tranh giáo dục nhiều khung.",1],
+        [2,"/eduinfographic","Tạo infographic tóm tắt kiến thức bằng hình ảnh.",1],
+        [3,"/edumindmap","Tạo sơ đồ tư duy của một chủ đề.",1],
+        [4,"/educonceptmap","Biểu diễn khái niệm và quan hệ giữa chúng.",1],
+        [5,"/eduflowchart","Vẽ lưu đồ quy trình hoặc thuật toán.",1],
+        [6,"/edudiagram","Tạo sơ đồ giải thích cấu trúc hoặc cơ chế.",1],
+        [7,"/eduposter","Thiết kế áp phích giáo dục.",1],
+        [8,"/edustory","Kể chuyện để giải thích một kiến thức.",1],
+        [9,"/eduanalogy","Dùng phép tương tự để làm rõ khái niệm khó.",1],
+        [10,"/edumetaphor","Giải thích bằng ẩn dụ dễ nhớ.",1],
+        [11,"/eduslides","Chuyển nội dung thành dàn bài trình chiếu.",1],
+        [12,"/eduvideo","Viết kịch bản video giáo dục.",1],
+        [13,"/edushortvideo","Tạo kịch bản video học tập ngắn.",1],
+        [14,"/edupodcast","Viết kịch bản podcast giảng giải.",1],
+        [15,"/eduaudiolecture","Chuyển nội dung thành bài giảng phù hợp để đọc thành tiếng.",1],
+        [16,"/eduvisualabstract","Tóm tắt nghiên cứu bằng hình ảnh và thông điệp chính.",1],
+        [17,"/edutimeline","Trình bày kiến thức theo dòng thời gian.",1],
+        [18,"/educomparison","So sánh hai hoặc nhiều khái niệm.",1],
+        [19,"/edutable","Hệ thống hóa nội dung thành bảng.",1],
+        [20,"/eduflashcards","Tạo thẻ ghi nhớ hỏi–đáp.",1],
+        [21,"/eduglossary","Tạo bảng thuật ngữ và định nghĩa.",1],
+        [22,"/edukeypoints","Rút ra các ý chính cần ghi nhớ.",1],
+        [23,"/edusummary","Tóm tắt nội dung theo độ dài yêu cầu.",1],
+        [24,"/educhunk","Chia kiến thức thành các phần nhỏ dễ học.",1],
+        [25,"/edumultiformat","Chuyển một kiến thức sang nhiều hình thức trình bày.",1],
+        [26,"/edudiscover","Thiết kế hoạt động để người học tự khám phá kiến thức.",2],
+        [27,"/eduinquiry","Xây dựng bài học theo phương pháp truy vấn.",2],
+        [28,"/eduproblemposing","Tạo các bài toán hoặc vấn đề từ một tình huống.",2],
+        [29,"/eduproblemsolving","Phân tích và giải quyết vấn đề theo từng bước.",2],
+        [30,"/edulogic","Phân tích cấu trúc logic của một lập luận.",2],
+        [31,"/edudeduction","Xây dựng suy luận diễn dịch.",2],
+        [32,"/eduinduction","Khám phá quy luật từ các trường hợp riêng.",2],
+        [33,"/eduanalogicalreasoning","Thiết kế hoạt động suy luận tương tự.",2],
+        [34,"/edumodeling","Mô hình hóa tình huống thực tế bằng toán học hoặc hệ thống.",2],
+        [35,"/educriticalthinking","Phát hiện giả định, thiên kiến và điểm yếu trong lập luận.",2],
+        [36,"/eduevaluateclaims","Đánh giá độ tin cậy của một nhận định.",2],
+        [37,"/eduproof","Xây dựng hoặc giải thích chứng minh toán học.",2],
+        [38,"/eduproofcritique","Kiểm tra và phản biện một chứng minh.",2],
+        [39,"/educontradiction","Giải thích phương pháp chứng minh phản chứng.",2],
+        [40,"/educounterexample","Tìm phản ví dụ để kiểm tra mệnh đề.",2],
+        [41,"/eduhypothesis","Đề xuất giả thuyết có thể kiểm tra.",2],
+        [42,"/eduexperiment","Thiết kế thí nghiệm để kiểm tra giả thuyết.",2],
+        [43,"/edudebate","Tổ chức tranh biện học thuật.",2],
+        [44,"/eduperspectives","Phân tích vấn đề từ nhiều góc nhìn.",2],
+        [45,"/edufirstprinciples","Phân rã vấn đề về các nguyên lý nền tảng.",2],
+        [46,"/edudecompose","Chia vấn đề phức tạp thành các phần nhỏ.",2],
+        [47,"/edusynthesize","Tổng hợp nhiều ý tưởng thành một cấu trúc thống nhất.",2],
+        [48,"/edudivergent","Tạo nhiều hướng giải quyết khác nhau.",2],
+        [49,"/educonvergent","Chọn và hợp nhất các phương án phù hợp nhất.",2],
+        [50,"/edureflection","Hướng dẫn người học tự phản tư về quá trình tư duy.",2],
+        [51,"/edulessonplan","Soạn kế hoạch bài dạy theo mục tiêu và tiến trình.",3],
+        [52,"/edulearningobjectives","Xây dựng mục tiêu học tập đo lường được.",3],
+        [53,"/eduoutcomes","Xác định chuẩn đầu ra của học phần hoặc chương trình.",3],
+        [54,"/edubloom","Phân loại mục tiêu theo các mức tư duy Bloom.",3],
+        [55,"/edubackwarddesign","Thiết kế ngược từ kết quả mong đợi.",3],
+        [56,"/educonstructivism","Thiết kế hoạt động theo hướng kiến tạo tri thức.",3],
+        [57,"/edulampert","Thiết kế giờ học theo định hướng khám phá, lập luận và thảo luận toán học của Magdalene Lampert.",3],
+        [58,"/edurj","Thiết kế bài học nhấn mạnh Reasoning and Justification.",3],
+        [59,"/educdio","Thiết kế hoạt động theo chu trình Conceive–Design–Implement–Operate.",3],
+        [60,"/educt2018","Đối chiếu thiết kế bài học với Chương trình GDPT 2018.",3],
+        [61,"/eduteachingsequence","Xây dựng trình tự hoạt động dạy học.",3],
+        [62,"/eduwarmup","Tạo hoạt động khởi động.",3],
+        [63,"/edupresentation","Soạn phần giáo viên trình bày kiến thức.",3],
+        [64,"/eduguidedpractice","Thiết kế luyện tập có hướng dẫn.",3],
+        [65,"/eduindependentpractice","Thiết kế luyện tập độc lập.",3],
+        [66,"/edugroupwork","Xây dựng hoạt động học tập nhóm.",3],
+        [67,"/eduflippedclassroom","Thiết kế lớp học đảo ngược.",3],
+        [68,"/eduinquirylesson","Xây dựng bài học theo chu trình đặt câu hỏi–khám phá–kết luận.",3],
+        [69,"/eduprojectbased","Thiết kế bài học theo dự án.",3],
+        [70,"/eduproblembased","Thiết kế học tập dựa trên vấn đề.",3],
+        [71,"/edustationrotation","Tổ chức học tập luân phiên qua các trạm.",3],
+        [72,"/edudifferentiation","Phân hóa hoạt động theo năng lực người học.",3],
+        [73,"/eduuniversaldesign","Thiết kế bài học dễ tiếp cận cho nhiều nhóm người học.",3],
+        [74,"/edulearningmaterials","Tạo tài liệu học tập đi kèm bài giảng.",3],
+        [75,"/eduteacherreflection","Đánh giá và cải tiến bài dạy sau khi triển khai.",3],
+        [76,"/eduquiz","Tạo bài trắc nghiệm theo chủ đề.",4],
+        [77,"/edumcq","Tạo câu hỏi trắc nghiệm nhiều lựa chọn.",4],
+        [78,"/edushortanswer","Tạo câu hỏi trả lời ngắn.",4],
+        [79,"/eduessay","Tạo đề tự luận và yêu cầu lập luận.",4],
+        [80,"/eduproblemset","Tạo bộ bài tập theo chủ đề và độ khó.",4],
+        [81,"/eduexam","Xây dựng đề kiểm tra theo ma trận.",4],
+        [82,"/edutestblueprint","Thiết kế ma trận đề theo nội dung và năng lực.",4],
+        [83,"/edurubric","Xây dựng bảng tiêu chí chấm điểm.",4],
+        [84,"/edugrading","Đề xuất thang điểm và hướng dẫn chấm.",4],
+        [85,"/edufeedback","Viết phản hồi cụ thể cho bài làm.",4],
+        [86,"/edumistakeanalysis","Phân tích lỗi sai và nguyên nhân có thể có.",4],
+        [87,"/edudiagnostic","Tạo bài đánh giá đầu vào để xác định kiến thức nền.",4],
+        [88,"/eduformative","Thiết kế đánh giá thường xuyên trong quá trình học.",4],
+        [89,"/edusummative","Thiết kế đánh giá tổng kết.",4],
+        [90,"/eduselfassessment","Hướng dẫn người học tự đánh giá.",4],
+        [91,"/edupeerassessment","Thiết kế đánh giá đồng đẳng giữa người học.",4],
+        [92,"/eduperformance","Xây dựng nhiệm vụ đánh giá qua thực hiện thực tế.",4],
+        [93,"/eduoralexam","Tạo bộ câu hỏi thi vấn đáp.",4],
+        [94,"/eduviva","Mô phỏng buổi bảo vệ đồ án hoặc luận văn.",4],
+        [95,"/eduexamvariants","Tạo nhiều mã đề tương đương.",4],
+        [96,"/edudistractors","Tạo và phân tích phương án nhiễu trong câu hỏi trắc nghiệm.",4],
+        [97,"/eduitemanalysis","Phân tích độ khó, khả năng phân biệt và chất lượng câu hỏi khi có dữ liệu.",4],
+        [98,"/edumasterycheck","Kiểm tra người học đã đạt tiêu chí thành thạo chưa.",4],
+        [99,"/eduplagiarismreview","Hỗ trợ phát hiện dấu hiệu trùng lặp và yêu cầu xác minh nguồn.",4],
+        [100,"/eduevidenceportfolio","Xây dựng hồ sơ minh chứng năng lực theo thời gian.",4],
+        [101,"/edulearningprofile","Lập hồ sơ năng lực và nhu cầu học tập.",5],
+        [102,"/edupersonalpath","Xây dựng lộ trình học tập cá nhân.",5],
+        [103,"/eduleveladjust","Điều chỉnh độ khó theo trình độ.",5],
+        [104,"/eduscaffold","Chia nhiệm vụ khó thành các bước hỗ trợ.",5],
+        [105,"/eduhint","Đưa ra gợi ý mà không tiết lộ ngay đáp án.",5],
+        [106,"/edusocratic","Dạy bằng chuỗi câu hỏi gợi mở.",5],
+        [107,"/edututor","Đóng vai gia sư tương tác.",5],
+        [108,"/edumathcoach","Hướng dẫn người học giải toán theo từng bước.",5],
+        [109,"/eduremediation","Bổ trợ kiến thức còn thiếu.",5],
+        [110,"/edumastery","Lập kế hoạch học đến khi đạt mức thành thạo.",5],
+        [111,"/eduspacedlearning","Phân phối kiến thức theo nhịp học phù hợp.",5],
+        [112,"/eduretrievalpractice","Tạo hoạt động chủ động nhớ lại kiến thức.",5],
+        [113,"/eduspacedrepetition","Lập lịch ôn tập cách quãng.",5],
+        [114,"/eduforgettingcurve","Xây dựng kế hoạch ôn tập dựa trên nguy cơ quên.",5],
+        [115,"/eduknowledgegaps","Xác định các lỗ hổng kiến thức.",5],
+        [116,"/edumisconceptions","Phát hiện và sửa quan niệm sai.",5],
+        [117,"/edulearninganalytics","Phân tích dữ liệu tiến bộ học tập.",5],
+        [118,"/edunextbesttask","Đề xuất nhiệm vụ tiếp theo dựa trên bằng chứng học tập.",5],
+        [119,"/educhallenge","Tạo thử thách phù hợp với trình độ hiện tại.",5],
+        [120,"/eduenrichment","Mở rộng kiến thức cho người học tiến nhanh.",5],
+        [121,"/edusupportplan","Lập kế hoạch hỗ trợ người học gặp khó khăn.",5],
+        [122,"/edumotivation","Thiết kế hoạt động tăng động lực học tập.",5],
+        [123,"/edugoalsetting","Giúp người học đặt mục tiêu và theo dõi tiến độ.",5],
+        [124,"/edulearningjournal","Tạo nhật ký học tập và suy ngẫm.",5],
+        [125,"/edumetacognition","Rèn luyện khả năng nhận thức về chính quá trình tư duy.",5],
+        [126,"/lisflow","Mô tả dòng chảy tri thức từ đầu vào đến đầu ra.",6],
+        [127,"/lisinput","Chuẩn hóa đầu vào: đề bài, câu trả lời, tài liệu hoặc dữ liệu.",6],
+        [128,"/lisoutput","Chuẩn hóa sản phẩm đầu ra của một hoạt động học.",6],
+        [129,"/lisfeedbackloop","Thiết kế vòng phản hồi để cải tiến hoạt động tiếp theo.",6],
+        [130,"/lisknowledgeunit","Chuyển kiến thức thành đơn vị có cấu trúc.",6],
+        [131,"/lisknowledgegraph","Xây dựng đồ thị khái niệm và quan hệ tri thức.",6],
+        [132,"/lisconceptlinks","Tạo các liên kết giữa khái niệm.",6],
+        [133,"/lisprerequisites","Xác định kiến thức tiên quyết.",6],
+        [134,"/lisknowledgemap","Lập bản đồ tri thức của một môn học.",6],
+        [135,"/liscompetencymap","Ánh xạ kiến thức vào năng lực cần đạt.",6],
+        [136,"/liserrorgraph","Biểu diễn quan hệ giữa lỗi sai và kiến thức liên quan.",6],
+        [137,"/lislearningtrace","Ghi nhận diễn biến học tập qua các hoạt động.",6],
+        [138,"/lisreasoningtrace","Tái dựng các bước lập luận từ bài làm và giải thích của người học.",6],
+        [139,"/lismisconceptionmap","Lập bản đồ các quan niệm sai phổ biến.",6],
+        [140,"/lisactivitydesign","Thiết kế hoạt động tương tác trong LIS.",6],
+        [141,"/lisinteraction","Xây dựng kịch bản trao đổi giữa người học và hệ thống.",6],
+        [142,"/lisstate","Xác định trạng thái học tập tại một thời điểm.",6],
+        [143,"/listransition","Định nghĩa điều kiện chuyển từ trạng thái học này sang trạng thái khác.",6],
+        [144,"/lisnextaction","Đề xuất hành động tiếp theo dựa trên trạng thái hiện tại.",6],
+        [145,"/lismasterycriteria","Xác định bằng chứng cần có để công nhận mức thành thạo.",6],
+        [146,"/lisverify","Kiểm tra tính đúng đắn của kết quả học tập.",6],
+        [147,"/lisprovenance","Gắn nguồn gốc, phiên bản và xuất xứ của tri thức.",6],
+        [148,"/lisretrieval","Truy xuất tri thức liên quan từ kho dữ liệu.",6],
+        [149,"/lisrag","Thiết kế quy trình truy xuất tăng cường sinh nội dung.",6],
+        [150,"/lislivingbook","Chuyển giáo trình thành hệ thống tri thức có thể cập nhật và tương tác.",6],
+        [151,"/edustem","Xây dựng hoạt động liên môn STEM.",7],
+        [152,"/edusteam","Thiết kế nhiệm vụ tích hợp khoa học, công nghệ, kỹ thuật và toán học.",7],
+        [153,"/edupython","Tạo ví dụ hoặc bài tập Python phục vụ học tập.",7],
+        [154,"/edupythonlab","Thiết kế bài thực hành Python.",7],
+        [155,"/edualgorithm","Giải thích hoặc thiết kế thuật toán.",7],
+        [156,"/edupseudocode","Chuyển lời giải thành mã giả.",7],
+        [157,"/eduflowcode","Biểu diễn logic chương trình bằng lưu đồ.",7],
+        [158,"/edudebug","Phân tích lỗi chương trình và cách sửa.",7],
+        [159,"/educodingchallenge","Tạo thử thách lập trình theo cấp độ.",7],
+        [160,"/edulatex","Soạn nội dung toán học bằng LaTeX.",7],
+        [161,"/edumathjax","Chuẩn hóa công thức để hiển thị bằng MathJax.",7],
+        [162,"/edutikz","Tạo sơ đồ và hình minh họa bằng TikZ.",7],
+        [163,"/edugraphplot","Vẽ đồ thị hàm số hoặc dữ liệu.",7],
+        [164,"/edugeometry","Giải thích và minh họa hình học.",7],
+        [165,"/edudynamicgeometry","Thiết kế hoạt động hình học động.",7],
+        [166,"/edufractal","Tạo hoạt động khám phá hình học fractal.",7],
+        [167,"/edusimulation","Xây dựng mô phỏng một hiện tượng hoặc hệ thống.",7],
+        [168,"/eduvirtualexperiment","Thiết kế thí nghiệm ảo.",7],
+        [169,"/eduphysicslab","Xây dựng bài thực hành vật lý.",7],
+        [170,"/educhemistrylab","Thiết kế hoạt động thực hành hóa học an toàn.",7],
+        [171,"/edubiology","Mô hình hóa hiện tượng sinh học.",7],
+        [172,"/edudataanalysis","Phân tích dữ liệu phục vụ học tập và thí nghiệm.",7],
+        [173,"/edustatistics","Giải thích thống kê qua dữ liệu và ví dụ.",7],
+        [174,"/edurobotics","Thiết kế bài học robot và điều khiển.",7],
+        [175,"/edudigitaltwin","Mô hình hóa một đối tượng thực bằng bản sao số phục vụ học tập.",7],
+        [176,"/educurriculum","Thiết kế cấu trúc chương trình đào tạo.",8],
+        [177,"/educourseoutline","Xây dựng đề cương học phần.",8],
+        [178,"/edusyllabus","Soạn đề cương môn học với mục tiêu, nội dung và đánh giá.",8],
+        [179,"/eduprogrammapping","Ánh xạ học phần vào chuẩn đầu ra chương trình.",8],
+        [180,"/edumodulemap","Chia học phần thành các mô-đun học tập.",8],
+        [181,"/educhapterplan","Xây dựng cấu trúc chương hoặc bài trong giáo trình.",8],
+        [182,"/edutextbook","Soạn nội dung giáo trình theo văn phong học thuật.",8],
+        [183,"/edurewriteacademic","Biên tập nội dung theo phong cách khoa học.",8],
+        [184,"/edureferences","Chuẩn hóa và kiểm tra thông tin tài liệu tham khảo.",8],
+        [185,"/educitationaudit","Đối chiếu trích dẫn với nguồn được cung cấp hoặc nguồn truy cập được.",8],
+        [186,"/edupdfextract","Trích xuất nội dung học tập từ PDF.",8],
+        [187,"/edudocumentqa","Tạo câu hỏi–đáp án dựa trên tài liệu.",8],
+        [188,"/eduragcorpus","Chuẩn bị kho tài liệu cho hệ thống RAG.",8],
+        [189,"/educhunking","Chia tài liệu thành các đoạn phục vụ truy xuất.",8],
+        [190,"/edumetadata","Xây dựng metadata cho tài liệu, chương, mục và trang.",8],
+        [191,"/educontentaudit","Kiểm tra độ bao phủ, tính nhất quán và phần nội dung còn thiếu.",8],
+        [192,"/edupedagogyreview","Đánh giá tính phù hợp sư phạm của học liệu.",8],
+        [193,"/eduaccessibility","Kiểm tra khả năng tiếp cận của tài liệu.",8],
+        [194,"/edutranslate","Dịch tài liệu giáo dục có giữ nguyên thuật ngữ.",8],
+        [195,"/edubilingual","Xây dựng học liệu song ngữ.",8],
+        [196,"/eduopenresources","Lập kế hoạch sử dụng tài nguyên giáo dục mở.",8],
+        [197,"/edumicrolearning","Chuyển nội dung thành các bài học ngắn.",8],
+        [198,"/educontentversion","Quản lý phiên bản học liệu.",8],
+        [199,"/educontentreuse","Tái sử dụng nội dung trong nhiều môn hoặc học phần.",8],
+        [200,"/edulearningpackage","Đóng gói bài học thành bộ tài liệu gồm nội dung, hoạt động và đánh giá.",8],
+        [201,"/eduvocational","Thiết kế nội dung đào tạo nghề.",9],
+        [202,"/eduprofessionalcompetency","Xây dựng khung năng lực nghề nghiệp.",9],
+        [203,"/edujobtask","Phân tích nhiệm vụ thực tế của một vị trí công việc.",9],
+        [204,"/educasestudy","Tạo tình huống nghiên cứu điển hình.",9],
+        [205,"/edurealworldproblem","Xây dựng bài học từ vấn đề thực tiễn.",9],
+        [206,"/edusimulationroleplay","Mô phỏng vai trò trong môi trường nghề nghiệp.",9],
+        [207,"/eduworkshop","Thiết kế buổi thực hành hoặc workshop.",9],
+        [208,"/edulabprotocol","Soạn quy trình thực hành và hướng dẫn an toàn.",9],
+        [209,"/eduprojectbrief","Viết yêu cầu và phạm vi dự án học tập.",9],
+        [210,"/eduprojectrubric","Xây dựng tiêu chí đánh giá sản phẩm dự án.",9],
+        [211,"/educapstone","Thiết kế đồ án tổng hợp cuối khóa.",9],
+        [212,"/eduinternship","Xây dựng kế hoạch thực tập.",9],
+        [213,"/eduworkplaceassessment","Đánh giá năng lực trong môi trường làm việc.",9],
+        [214,"/eduprofessionalportfolio","Xây dựng hồ sơ năng lực nghề nghiệp.",9],
+        [215,"/eduresearchquestion","Phát triển câu hỏi nghiên cứu từ một chủ đề.",9],
+        [216,"/eduliteraturereview","Lập cấu trúc tổng quan tài liệu nghiên cứu.",9],
+        [217,"/eduresearchdesign","Xây dựng thiết kế nghiên cứu giáo dục.",9],
+        [218,"/eduresearchmethods","Lựa chọn và giải thích phương pháp nghiên cứu.",9],
+        [219,"/eduresearchdata","Lập kế hoạch thu thập và quản lý dữ liệu nghiên cứu.",9],
+        [220,"/eduresearchethics","Kiểm tra các vấn đề đạo đức nghiên cứu.",9],
+        [221,"/eduresearchposter","Thiết kế poster khoa học.",9],
+        [222,"/eduresearchpresentation","Chuẩn bị bài trình bày nghiên cứu.",9],
+        [223,"/eduthesisdefense","Chuẩn bị câu hỏi và nội dung bảo vệ luận văn.",9],
+        [224,"/eduuniversitycourse","Thiết kế học phần đại học gắn với chuẩn đầu ra.",9],
+        [225,"/eduindustryalignment","Đối chiếu chương trình đào tạo với yêu cầu của ngành nghề.",9],
+        [226,"/eduagent","Thiết kế một AI Agent phục vụ nhiệm vụ giáo dục.",10],
+        [227,"/edumultiagent","Phân chia công việc giữa nhiều AI Agent.",10],
+        [228,"/eduteacheragent","Thiết kế Agent hỗ trợ giáo viên.",10],
+        [229,"/edustudentagent","Thiết kế Agent hỗ trợ người học.",10],
+        [230,"/eduexamagent","Thiết kế Agent tạo và kiểm tra đề thi.",10],
+        [231,"/eduresearchagent","Thiết kế Agent hỗ trợ nghiên cứu giáo dục.",10],
+        [232,"/eduagentworkflow","Xây dựng quy trình phối hợp các Agent.",10],
+        [233,"/eduagentcontract","Xác định đầu vào, đầu ra, trách nhiệm và điều kiện hoàn thành của Agent.",10],
+        [234,"/eduagentverify","Kiểm tra kết quả do Agent tạo ra theo tiêu chí xác định.",10],
+        [235,"/eduagentorchestrate","Điều phối thứ tự thực hiện và bàn giao giữa các Agent.",10],
+        [236,"/eduautograding","Hỗ trợ chấm bài tự động theo rubric và quy tắc.",10],
+        [237,"/eduaifeedback","Tạo phản hồi học tập có căn cứ từ dữ liệu bài làm.",10],
+        [238,"/eduaigovernance","Xây dựng nguyên tắc quản trị AI trong giáo dục.",10],
+        [239,"/eduaiprivacy","Rà soát rủi ro dữ liệu cá nhân trong hoạt động học tập.",10],
+        [240,"/eduaifairness","Kiểm tra nguy cơ thiên lệch trong đánh giá và hỗ trợ học tập.",10],
+        [241,"/eduaidisclosure","Soạn quy tắc công khai việc sử dụng AI trong học tập.",10],
+        [242,"/eduacademicintegrity","Thiết kế quy trình bảo vệ tính trung thực học thuật.",10],
+        [243,"/eduaifacts","Kiểm tra các khẳng định do AI đưa ra dựa trên nguồn và bằng chứng.",10],
+        [244,"/eduknowledgeaudit","Kiểm tra độ đầy đủ, nhất quán và nguồn gốc của kho tri thức.",10],
+        [245,"/eduqualityassurance","Xây dựng quy trình bảo đảm chất lượng giáo dục.",10],
+        [246,"/edulearninganalyticsdashboard","Xác định chỉ số và bố cục bảng điều khiển học tập.",10],
+        [247,"/eduautomation","Xác định các công việc giáo dục có thể tự động hóa.",10],
+        [248,"/edueventpipeline","Thiết kế luồng sự kiện từ hoạt động học đến cập nhật hệ thống.",10],
+        [249,"/eduevaluationloop","Thiết kế vòng lặp đánh giá và cải tiến hệ thống giáo dục.",10],
+        [250,"/edusystemaudit","Kiểm tra tổng thể quy trình, dữ liệu, chất lượng và trách nhiệm của hệ thống giáo dục.",10]
+    ];
+
+    const CATS = {
+        0: { name: "Tất cả lệnh", icon: "📚" },
+        1: { name: "Trình bày tri thức", icon: "🎨" },
+        2: { name: "Tư duy và lập luận", icon: "🧠" },
+        3: { name: "Thiết kế bài giảng", icon: "📝" },
+        4: { name: "Kiểm tra và đánh giá", icon: "✅" },
+        5: { name: "Cá nhân hóa học tập", icon: "🎯" },
+        6: { name: "LIS và dòng chảy tri thức", icon: "🌊" },
+        7: { name: "STEM, lập trình và mô phỏng", icon: "💻" },
+        8: { name: "Chương trình và học liệu", icon: "📖" },
+        9: { name: "Giáo dục nghề nghiệp & ĐH", icon: "🎓" },
+        10: { name: "AI Agent và quản trị", icon: "🤖" }
+    };
+
+    let currentCat = 0;
+    let searchTerm = "";
+
+    function renderCategories() {
+        const list = document.getElementById('categoryList');
+        list.innerHTML = '';
+        for (let i = 0; i <= 10; i++) {
+            const count = i === 0 ? 250 : D.filter(d => d[3] === i).length;
+            const div = document.createElement('div');
+            div.className = `nav-item ${currentCat === i ? 'active' : ''}`;
+            div.innerHTML = `<span>${CATS[i].icon} ${CATS[i].name}</span><span class="nav-count">${count}</span>`;
+            div.onclick = () => { currentCat = i; render(); document.querySelector('.sidebar').classList.remove('open'); };
+            list.appendChild(div);
+        }
+    }
+
+    function renderCommands() {
+        const grid = document.getElementById('commandGrid');
+        const filtered = D.filter(d => {
+            const matchCat = currentCat === 0 || d[3] === currentCat;
+            const matchSearch = searchTerm === "" || 
+                                d[1].toLowerCase().includes(searchTerm) || 
+                                d[2].toLowerCase().includes(searchTerm);
+            return matchCat && matchSearch;
+        });
+
+        document.getElementById('filteredCount').innerText = filtered.length;
+        grid.innerHTML = '';
+
+        if (filtered.length === 0) {
+            grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:var(--text-secondary); padding:40px;">Không tìm thấy lệnh phù hợp.</p>';
+            return;
+        }
+
+        filtered.forEach(d => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="card-header">
+                    <span class="cmd">${d[1]}</span>
+                    <span class="card-id">#${d[0]}</span>
+                </div>
+                <div class="card-desc">${d[2]}</div>
+                <div class="card-cat">${CATS[d[3]].icon} ${CATS[d[3]].name}</div>
+            `;
+            card.onclick = () => {
+                navigator.clipboard.writeText(d[1]).then(() => {
+                    const toast = document.getElementById('toast');
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                });
+            };
+            grid.appendChild(card);
+        });
+    }
+
+    function render() {
+        renderCategories();
+        renderCommands();
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        searchTerm = e.target.value.toLowerCase().trim();
+        renderCommands();
+    });
+
+    // Init
+    render();
+</script>
+</body>
+</html>
